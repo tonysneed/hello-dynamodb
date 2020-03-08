@@ -1,0 +1,136 @@
+[
+    {
+      "LoginAlias": {
+        "S": "johns"
+      },
+      "FirstName": {
+        "S": "John"
+      },
+      "LastName": {
+        "S": "Stiles"
+      },
+      "ManagerLoginAlias": {
+        "S": "NA"
+      },
+      "Skills": {
+        "SS": [
+          "executive management"
+        ]
+      }
+    },
+    {
+      "LoginAlias": {
+        "S": "marthar"
+      },
+      "FirstName": {
+        "S": "Martha"
+      },
+      "LastName": {
+        "S": "Rivera"
+      },
+      "ManagerLoginAlias": {
+        "S": "johns"
+      },
+      "Skills": {
+        "SS": [
+          "software",
+          "management"
+        ]
+      }
+    },
+    {
+      "LoginAlias": {
+        "S": "mateoj"
+      },
+      "FirstName": {
+        "S": "Mateo"
+      },
+      "LastName": {
+        "S": "Jackson"
+      },
+      "ManagerLoginAlias": {
+        "S": "marthar"
+      },
+      "Skills": {
+        "SS": [
+          "software"
+        ]
+      }
+    },
+    {
+      "LoginAlias": {
+        "S": "janed"
+      },
+      "FirstName": {
+        "S": "Jane"
+      },
+      "LastName": {
+        "S": "Doe"
+      },
+      "ManagerLoginAlias": {
+        "S": "marthar"
+      },
+      "Skills": {
+        "SS": [
+          "software"
+        ]
+      }
+    },
+    {
+      "LoginAlias": {
+        "S": "diegor"
+      },
+      "FirstName": {
+        "S": "Diego"
+      },
+      "LastName": {
+        "S": "Ramirez"
+      },
+      "ManagerLoginAlias": {
+        "S": "johns"
+      },
+      "Skills": {
+        "SS": [
+          "executive assistant"
+        ]
+      }
+    },
+    {
+      "LoginAlias": {
+        "S": "marym"
+      },
+      "FirstName": {
+        "S": "Mary"
+      },
+      "LastName": {
+        "S": "Major"
+      },
+      "ManagerLoginAlias": {
+        "S": "johns"
+      },
+      "Skills": {
+        "SS": [
+          "operations"
+        ]
+      }
+    },
+    {
+      "LoginAlias": {
+        "S": "janer"
+      },
+      "FirstName": {
+        "S": "Jane"
+      },
+      "LastName": {
+        "S": "Roe"
+      },
+      "ManagerLoginAlias": {
+        "S": "marthar"
+      },
+      "Skills": {
+        "SS": [
+          "software"
+        ]
+      }
+    }
+]
