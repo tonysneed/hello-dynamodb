@@ -21,13 +21,20 @@ namespace HelloDynamoDb
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var localMode = Configuration.GetValue<bool>("DynamoDb:LocalMode");
             var localServiceUrl = Configuration.GetValue<string>("DynamoDb:LocalServiceUrl");
-            services.AddSingleton<IAmazonDynamoDB>(sp =>
-                {
-                    var config = new AmazonDynamoDBConfig { ServiceURL = localServiceUrl };
-                    var credentials = new BasicAWSCredentials("hucrk3", "tw2d69");
-                    return new AmazonDynamoDBClient(credentials, config);
-                });
+            if (localMode)
+            {
+                services.AddSingleton<IAmazonDynamoDB>(sp =>
+                    {
+                        var config = new AmazonDynamoDBConfig { ServiceURL = localServiceUrl };
+                        return new AmazonDynamoDBClient(config);
+                    });
+            }
+            else
+            {
+                services.AddAWSService<IAmazonDynamoDB>();
+            }
             services.AddSingleton<IDynamoDBContext>(sp =>
                 {
                     var client = sp.GetRequiredService<IAmazonDynamoDB>();

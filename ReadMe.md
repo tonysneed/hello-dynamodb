@@ -12,9 +12,9 @@
 ## DynamoDb Local
 
 - Run DynamoDb Local with Docker.
-  - Start DynamoDb Local.
+  - Start DynamoDb Local. This command will mount a volume where a shared database will reside.
     ```
-    docker run -p 8000:8000 -d amazon/dynamodb-local
+    docker run -d -p 8000:8000 -v $(pwd)/local/dynamodb:/data/ amazon/dynamodb-local -jar DynamoDBLocal.jar -sharedDb -dbPath /data
     ```
   - Check to see if it is running.
     ```
@@ -26,6 +26,10 @@
   - Select Operations Builder, click Add New Connection, select DynamoDb Local, enter connection name of `Local`.
 \
     ![nosql-local](images/nosql-wb-dynamodb-local.png)
+- To list tables from the terminal using the AWS CLI.
+  ```
+  aws dynamodb --endpoint-url http://localhost:8000 list-tables
+  ```
 
 ## Data Model
 
@@ -65,20 +69,37 @@
     "LocalServiceUrl": "http://localhost:8000"
   }
   ```
-- Update `ConfigureServices` in `Startup` to register `IAmazonDynamoDB` with `LocalServiceUrl`.
+- Update `ConfigureServices` in `Startup` to register `IAmazonDynamoDB` and `IDynamoDBContext`.
   ```csharp
   public void ConfigureServices(IServiceCollection services)
   {
+      var localMode = Configuration.GetValue<bool>("DynamoDb:LocalMode");
       var localServiceUrl = Configuration.GetValue<string>("DynamoDb:LocalServiceUrl");
+      if (localMode)
+      {
+          services.AddSingleton<IAmazonDynamoDB>(sp =>
+              {
+                  var config = new AmazonDynamoDBConfig { ServiceURL = localServiceUrl };
+                  return new AmazonDynamoDBClient(config);
+              });
+      }
+      else
+      {
+          services.AddAWSService<IAmazonDynamoDB>();
+      }
       services.AddSingleton<IDynamoDBContext>(sp =>
           {
-              var clientConfig = new AmazonDynamoDBConfig { ServiceURL = localServiceUrl };
-              var client = new AmazonDynamoDBClient(clientConfig);
+              var client = sp.GetRequiredService<IAmazonDynamoDB>();
               return new DynamoDBContext(client);
           });
       services.AddControllers();
   }
   ```
+- To connect to DynamoDb Local you need to run the app in a `Development` hosting environment, which you can do by pressing F5 to debug, or by setting the environment at the command line.
+  ```
+  dotnet run --environment "Development"
+  ```
+- Otherwise to debug in `Production` mode, you can set `ASPNETCORE_ENVIRONMENT` to `Production` in launch.json, or simply execute `dotnet run` in the terminal.
 
 ## Model Controller
 
@@ -95,13 +116,13 @@
       public string LastName { get; set; }
       public string ManagerLoginAlias { get; set; }
       public string Designation { get; set; }
-      public ICollection<string> Skills { get; set; }
+      public List<string> Skills { get; set; }
   }
   ```
 - Scaffold Web API Controller.
-```
-dotnet aspnet-codegenerator controller -name EmployeeController -actions -api -outDir Controllers
-```
+  ```
+  dotnet aspnet-codegenerator controller -name EmployeeController -actions -api -outDir Controllers
+  ```
 - Inject `IDynamoDBContext` into controller constructor.
   ```csharp
   public IDynamoDBContext Context { get; }
@@ -137,7 +158,7 @@ dotnet aspnet-codegenerator controller -name EmployeeController -actions -api -o
   public async Task<IActionResult> Post([FromBody] Employee value)
   {
       await Context.SaveAsync(value);
-      return CreatedAtAction(nameof(Get), new { id = value.LoginAlias });
+      return CreatedAtAction(nameof(Get), new { id = value.LoginAlias }, null);
   }
 
   // PUT: api/Employee/john
@@ -150,7 +171,7 @@ dotnet aspnet-codegenerator controller -name EmployeeController -actions -api -o
       return Ok(result);
   }
 
-  // DELETE: api/ApiWithActions/john
+  // DELETE: api/Employee/john
   [HttpDelete("{id}")]
   public async Task<IActionResult> Delete(string id)
   {
@@ -159,4 +180,32 @@ dotnet aspnet-codegenerator controller -name EmployeeController -actions -api -o
       await Context.DeleteAsync<Employee>(result);
       return NoContent();
   }
+  ```
+- To test the controller, run the following from Postman.
+  ```json
+  GET: https://localhost:5001/api/employee/
+  GET: https://localhost:5001/api/employee/johns
+  POST: https://localhost:5001/api/employee/
+  {
+      "loginAlias": "tonys",
+      "firstName": "Tony",
+      "lastName": "Sneed",
+      "managerLoginAlias": "NA",
+      "designation": null,
+      "skills": [
+          "software"
+      ]
+  }
+  PUT: https://localhost:5001/api/employee/
+  {
+      "loginAlias": "tonys",
+      "firstName": "Anthony",
+      "lastName": "Sneed",
+      "managerLoginAlias": "NA",
+      "designation": null,
+      "skills": [
+          "software"
+      ]
+  }
+  DELETE: https://localhost:5001/api/employee/tonys
   ```

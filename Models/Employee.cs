@@ -12,6 +12,6 @@ namespace HelloDynamoDb.Models
         public string LastName { get; set; }
         public string ManagerLoginAlias { get; set; }
         public string Designation { get; set; }
-        public ICollection<string> Skills { get; set; }
+        public List<string> Skills { get; set; }
     }
 }

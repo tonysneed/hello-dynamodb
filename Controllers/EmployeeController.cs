@@ -42,7 +42,7 @@ namespace HelloDynamoDb.Controllers
         public async Task<IActionResult> Post([FromBody] Employee value)
         {
             await Context.SaveAsync(value);
-            return CreatedAtAction(nameof(Get), new { id = value.LoginAlias });
+            return CreatedAtAction(nameof(Get), new { id = value.LoginAlias }, null);
         }
 
         // PUT: api/Employee/john
@@ -55,7 +55,7 @@ namespace HelloDynamoDb.Controllers
             return Ok(result);
         }
 
-        // DELETE: api/ApiWithActions/john
+        // DELETE: api/Employee/john
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
